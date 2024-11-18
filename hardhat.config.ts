@@ -20,7 +20,7 @@ const config: HardhatUserConfig = {
       },
     ],
   },
-  defaultNetwork: process.env.NETWORK || "adil_devnet",
+  defaultNetwork: process.env.NETWORK || "vku_chain",
 
   networks: {
     hardhat: { allowUnlimitedContractSize: true },
