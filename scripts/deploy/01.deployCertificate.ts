@@ -4,32 +4,32 @@ async function main() {
   const [deployer] = await ethers.getSigners();
 
   console.log(
-    "Deploying VerifiableNFT contract with the account:",
+    "Deploying CerifiableNFT contract with the account:",
     deployer.address
   );
   const name = "Graduation Diploma Course 20";
   const symbol = "GDC20";
   const baseUri = "https://amber-parallel-falcon-815.mypinata.cloud/ipfs";
 
-  const VerifiableNFT = await ethers.getContractFactory("VerifiableNFT");
-  const VerifiableNFTContract = await VerifiableNFT.deploy(
+  const CerifiableNFT = await ethers.getContractFactory("CerifiableNFT");
+  const CerifiableNFTContract = await CerifiableNFT.deploy(
     name,
     symbol,
     baseUri
   );
-  await VerifiableNFTContract.waitForDeployment();
-  const VerifiableNFTContractDeployed =
-    await VerifiableNFTContract.getAddress();
+  await CerifiableNFTContract.waitForDeployment();
+  const CerifiableNFTContractDeployed =
+    await CerifiableNFTContract.getAddress();
 
   console.log(
-    "VerifiableNFT contract deployed at address: ",
-    VerifiableNFTContractDeployed
+    "CerifiableNFT contract deployed at address: ",
+    CerifiableNFTContractDeployed
   );
 
   await run("verify:verify", {
-    address: VerifiableNFTContractDeployed,
+    address: CerifiableNFTContractDeployed,
     constructorArguments: [name, symbol, baseUri],
-    contract: "contracts/VerifiableNFT.sol:VerifiableNFT",
+    contract: "contracts/CerifiableNFT.sol:CerifiableNFT",
   });
 }
 
