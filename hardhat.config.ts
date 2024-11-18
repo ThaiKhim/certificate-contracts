@@ -25,7 +25,7 @@ const config: HardhatUserConfig = {
   networks: {
     hardhat: { allowUnlimitedContractSize: true },
     vku_chain: {
-      url: process.env.RPC_URL ?? "http://207.244.229.251:8549/",
+      url: process.env.RPC_URL ?? "http://34.81.113.222:8549/",
       chainId: 6660002,
       accounts: accounts,
       gasPrice: 10000000000,
@@ -40,8 +40,8 @@ const config: HardhatUserConfig = {
         network: "vku_chain",
         chainId: 6660002,
         urls: {
-          apiURL: "http://207.244.229.251/api",
-          browserURL: "http://207.244.229.251",
+          apiURL: "http://34.81.113.222//api",
+          browserURL: "http://34.81.113.222/",
         },
       },
     ],
