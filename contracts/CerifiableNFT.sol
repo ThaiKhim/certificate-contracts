@@ -4,12 +4,15 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract VerifiableNFT is ERC721URIStorage, Ownable {
+contract CerifiableNFT is ERC721URIStorage, Ownable {
     // Mapping from token ID to the array of verifier addresses
     mapping(uint256 => address[]) private _verifiers;
 
     // Mapping to store operator addresses
     mapping(address => bool) private _operators;
+
+    // Counter for total supply
+    uint256 private _totalSupply;
 
     // Event to log when a token is verified
     event TokenVerified(uint256 tokenId, address verifier);
@@ -33,7 +36,7 @@ contract VerifiableNFT is ERC721URIStorage, Ownable {
         _;
     }
 
-        /**
+    /**
      * @dev Modifier to restrict access to only operators.
      */
     modifier onlyOperator() {
@@ -41,6 +44,12 @@ contract VerifiableNFT is ERC721URIStorage, Ownable {
         _;
     }
 
+    /**
+     * @dev Returns the total supply of minted tokens.
+     */
+    function totalSupply() public view returns (uint256) {
+        return _totalSupply;
+    }
 
     /**
      * @dev Function to verify a token by an operator.
@@ -97,7 +106,7 @@ contract VerifiableNFT is ERC721URIStorage, Ownable {
 
     /**
      * @dev Mint an NFT with a specific metadata URI.
-     * Only the owner can mint NFTs.
+     * Only the owner or an operator can mint NFTs.
      * @param to The address to mint the NFT to.
      * @param tokenId The ID of the token to be minted.
      * @param tokenURI The metadata URI for the token.
@@ -105,16 +114,16 @@ contract VerifiableNFT is ERC721URIStorage, Ownable {
     function mintWithMetadata(address to, uint256 tokenId, string memory tokenURI) public onlyOwnerOrOperator {
         _mint(to, tokenId);
         _setTokenURI(tokenId, tokenURI);
+        _totalSupply++;
     }
     
     /**
      * @dev Batch mint multiple NFTs with specific metadata URIs.
-     * Only the owner can mint NFTs.
+     * Only the owner or an operator can mint NFTs.
      * @param to Array of addresses to mint the NFTs to.
      * @param tokenIds Array of token IDs to be minted.
      * @param tokenURIs Array of metadata URIs for each token.
      */
-
     function batchMintWithMetadata(address[] memory to, uint256[] memory tokenIds, string[] memory tokenURIs) public onlyOwnerOrOperator {
         require(to.length == tokenIds.length, "Mismatched input lengths");
         require(to.length == tokenURIs.length, "Mismatched input lengths");
@@ -122,13 +131,13 @@ contract VerifiableNFT is ERC721URIStorage, Ownable {
         for (uint256 i = 0; i < to.length; i++) {
             _mint(to[i], tokenIds[i]);
             _setTokenURI(tokenIds[i], tokenURIs[i]);
+            _totalSupply++;
         }
     }
 
-
     /**
      * @dev Sets the base URI for all tokens.
-     * This function can be called only by the owner.
+     * This function can be called only by the owner or an operator.
      * @param baseURI The base URI to be set.
      */
     function setBaseURI(string memory baseURI) public onlyOwnerOrOperator {
