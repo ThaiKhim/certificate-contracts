@@ -8,6 +8,9 @@ contract CerifiableNFT is ERC721URIStorage, Ownable {
     // Mapping from token ID to the array of verifier addresses
     mapping(uint256 => address[]) private _verifiers;
 
+    // Mapping to store whether an address has verified a specific token ID
+    mapping(address => mapping(uint256 => bool)) private _isVerified;
+
     // Mapping to store operator addresses
     mapping(address => bool) private _operators;
 
@@ -25,7 +28,7 @@ contract CerifiableNFT is ERC721URIStorage, Ownable {
     string private _baseTokenURI;
 
     constructor(string memory name, string memory symbol, string memory baseURI) ERC721(name, symbol) Ownable(msg.sender) {
-        _baseTokenURI = baseURI;  // Set the base URI in the constructor
+        _baseTokenURI = baseURI; // Set the base URI in the constructor
     }
 
     /**
@@ -53,15 +56,27 @@ contract CerifiableNFT is ERC721URIStorage, Ownable {
 
     /**
      * @dev Function to verify a token by an operator.
-     * This function stores the verifier's address in the list for the token.
-     * Only callable by authorized operators.
+     * Ensures the sender has not already verified the token.
      * @param tokenId The ID of the token being verified.
      */
     function verify(uint256 tokenId) public onlyOperator {
+        require(!_isVerified[msg.sender][tokenId], "Already verified by sender");
+
         // Add the verifier (operator) to the list of verifiers for the token
         _verifiers[tokenId].push(msg.sender);
+        _isVerified[msg.sender][tokenId] = true;
 
         emit TokenVerified(tokenId, msg.sender);
+    }
+
+    /**
+     * @dev Check if an address has already verified a specific token ID.
+     * @param verifier The address to check.
+     * @param tokenId The ID of the token to check against.
+     * @return True if the address has verified the token, false otherwise.
+     */
+    function isVerify(address verifier, uint256 tokenId) public view returns (bool) {
+        return _isVerified[verifier][tokenId];
     }
 
     /**
@@ -74,10 +89,22 @@ contract CerifiableNFT is ERC721URIStorage, Ownable {
     }
 
     /**
+     * @dev Returns the bool of id is verified for a specific token ID.
+     * @param verifier The address of the verifier.
+     * @param tokenId The ID of the token
+     * @return A bool that verified the token.
+     */
+
+    function isVerified(address verifier,uint256 tokenId) public view returns (bool) {
+        return _isVerified[verifier][tokenId];
+    }
+
+    /**
      * @dev Check if an address is an operator.
      * @param operator The address to check.
      * @return True if the address is an operator, false otherwise.
      */
+    
     function isOperator(address operator) public view returns (bool) {
         return _operators[operator];
     }
@@ -116,7 +143,7 @@ contract CerifiableNFT is ERC721URIStorage, Ownable {
         _setTokenURI(tokenId, tokenURI);
         _totalSupply++;
     }
-    
+
     /**
      * @dev Batch mint multiple NFTs with specific metadata URIs.
      * Only the owner or an operator can mint NFTs.
